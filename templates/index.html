@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Merger</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; }
+        h1 { color: #333; }
+        .container { max-width: 800px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="file"], input[type="number"] { width: 95%; padding: 8px; margin-top: 5px; }
+        input[type="checkbox"] { margin-right: 10px; }
+        .pdf-entry { border: 1px solid #eee; padding: 15px; border-radius: 5px; margin-bottom: 10px; }
+        .submit-btn { background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        .submit-btn:hover { background-color: #45a049; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PDF Merger</h1>
+        <form action="/merge" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="template_pdf">Template PDF (Required)</label>
+                <input type="file" id="template_pdf" name="template_pdf" accept=".pdf" required>
+            </div>
+
+            <hr>
+            <h3>Attachments</h3>
+            <p>Select the PDFs you want to insert into the template.</p>
+
+            {% for pdf_type in pdf_types %}
+            <div class="pdf-entry">
+                <h4>
+                    <input type="checkbox" id="include_{{ pdf_type.id }}" name="include_{{ pdf_type.id }}" onchange="toggleFields('{{ pdf_type.id }}')">
+                    <label for="include_{{ pdf_type.id }}" style="display: inline;">{{ pdf_type.name }}</label>
+                </h4>
+                <div id="fields_{{ pdf_type.id }}" style="display: none;">
+                    <div class="form-group">
+                        <label for="{{ pdf_type.id }}">Upload {{ pdf_type.name }} PDF</label>
+                        <input type="file" id="{{ pdf_type.id }}" name="{{ pdf_type.id }}" accept=".pdf">
+                    </div>
+                    <div class="form-group">
+                        <label for="page_{{ pdf_type.id }}">Insert after page:</label>
+                        {% if pdf_type.id == 'catalog' %}
+                        <input type="number" id="page_{{ pdf_type.id }}" name="page_{{ pdf_type.id }}" value="{{ pdf_type.default_page }}" min="1">
+                        <small>Default is after the 'Datasheets' PDF. The page number will be adjusted automatically if 'Datasheets' is included.</small>
+                        {% else %}
+                        <input type="number" id="page_{{ pdf_type.id }}" name="page_{{ pdf_type.id }}" value="{{ pdf_type.default_page }}" min="1">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="submit-btn">Merge PDFs</button>
+        </form>
+    </div>
+
+    <script>
+        function toggleFields(pdfId) {
+            const checkbox = document.getElementById('include_' + pdfId);
+            const fieldsDiv = document.getElementById('fields_' + pdfId);
+            const fileInput = document.getElementById(pdfId);
+
+            if (checkbox.checked) {
+                fieldsDiv.style.display = 'block';
+                fileInput.required = true;
+            } else {
+                fieldsDiv.style.display = 'none';
+                fileInput.required = false;
+            }
+        }
+    </script>
+</body>
+</html>
