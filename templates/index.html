@@ -3,62 +3,668 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Merger</title>
+    <title>BMS PDF Joiner</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 2em; }
-        h1 { color: #333; }
-        .container { max-width: 800px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="file"], input[type="number"] { width: 95%; padding: 8px; margin-top: 5px; }
-        input[type="checkbox"] { margin-right: 10px; }
-        .pdf-entry { border: 1px solid #eee; padding: 15px; border-radius: 5px; margin-bottom: 10px; }
-        .submit-btn { background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
-        .submit-btn:hover { background-color: #45a049; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #151a35;
+            --bg-card: #1e2442;
+            --accent-primary: #6366f1;
+            --accent-secondary: #8b5cf6;
+            --accent-hover: #4f46e5;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --success: #10b981;
+            --success-hover: #059669;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #1a1f3a 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Welcome Screen Styles */
+        #welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1529 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeOut 0.8s ease-out 2.5s forwards;
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+
+        .welcome-content {
+            text-align: center;
+            animation: slideUp 1s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .welcome-logo {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .loading-dots {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            animation: fadeInUp 0.8s ease-out 3s backwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+        }
+
+        .header-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px var(--shadow);
+        }
+
+        /* Template Upload Section */
+        .template-section {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-icon {
+            font-size: 1.5rem;
+        }
+
+        /* File Upload Styles */
+        .file-upload-wrapper {
+            position: relative;
+            margin-top: 1rem;
+        }
+
+        input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .file-upload-button {
+            display: block;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-upload-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .file-upload-button:hover::before {
+            left: 100%;
+        }
+
+        .file-upload-button:hover {
+            border-color: var(--accent-primary);
+            background: rgba(99, 102, 241, 0.1);
+            transform: scale(1.02);
+        }
+
+        .file-upload-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-text {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .file-name {
+            margin-top: 0.5rem;
+            color: var(--accent-primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Attachments Section */
+        .attachments-header {
+            margin: 2rem 0 1.5rem;
+            text-align: center;
+        }
+
+        .attachments-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .attachments-description {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* PDF Entry Styles */
+        .pdf-entry {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pdf-entry::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary));
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .pdf-entry:hover::before {
+            transform: scaleY(1);
+        }
+
+        .pdf-entry:hover {
+            border-color: var(--accent-primary);
+            transform: translateX(4px);
+        }
+
+        .pdf-entry-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* Custom Checkbox */
+        input[type="checkbox"] {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        input[type="checkbox"]:hover {
+            border-color: var(--accent-primary);
+        }
+
+        input[type="checkbox"]:checked {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-color: var(--accent-primary);
+        }
+
+        input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            animation: checkPop 0.3s ease forwards;
+        }
+
+        @keyframes checkPop {
+            to {
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .pdf-entry-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            flex-grow: 1;
+        }
+
+        .pdf-entry-fields {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        small {
+            display: block;
+            margin-top: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Submit Button */
+        .submit-section {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            padding: 1rem 3rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        .submit-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: none;
+            margin: 2rem auto;
+            text-align: center;
+        }
+
+        .spinner {
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--accent-primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .welcome-title {
+                font-size: 2rem;
+            }
+        }
+
+        /* Scrollbar Styles */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-primary);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-hover);
+        }
     </style>
 </head>
 <body>
+    <!-- Welcome Screen -->
+    <div id="welcome-screen">
+        <div class="welcome-content">
+            <div class="welcome-logo">📄✨</div>
+            <h1 class="welcome-title">BMS PDF Joiner</h1>
+            <p class="welcome-subtitle">Merge your PDFs with style</p>
+            <div class="loading-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
     <div class="container">
-        <h1>PDF Merger</h1>
-        <form action="/merge" method="post" enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="template_pdf">Template PDF (Required)</label>
-                <input type="file" id="template_pdf" name="template_pdf" accept=".pdf" required>
+        <div class="header">
+            <div class="header-icon">📑</div>
+            <h1>BMS PDF Joiner</h1>
+            <p class="subtitle">Seamlessly merge multiple PDFs into a single template</p>
+        </div>
+
+        <form action="/merge" method="post" enctype="multipart/form-data" id="merge-form">
+            <!-- Template Upload Section -->
+            <div class="card template-section">
+                <div class="section-title">
+                    <span class="section-icon">📋</span>
+                    <span>Template PDF (Required)</span>
+                </div>
+                <div class="file-upload-wrapper">
+                    <input type="file" id="template_pdf" name="template_pdf" accept=".pdf" required onchange="updateFileName(this, 'template-file-name')">
+                    <label for="template_pdf" class="file-upload-button">
+                        <div class="file-upload-icon">📤</div>
+                        <div class="file-upload-text">Click to upload or drag and drop</div>
+                        <div id="template-file-name" class="file-name"></div>
+                    </label>
+                </div>
             </div>
 
-            <hr>
-            <h3>Attachments</h3>
-            <p>Select the PDFs you want to insert into the template.</p>
+            <!-- Attachments Section -->
+            <div class="attachments-header">
+                <h2 class="attachments-title">Document Attachments</h2>
+                <p class="attachments-description">Select and upload the PDFs you want to insert into the template</p>
+            </div>
 
             {% for pdf_type in pdf_types %}
             <div class="pdf-entry">
-                <h4>
-                    <input type="checkbox" id="include_{{ pdf_type.id }}" name="include_{{ pdf_type.id }}" onchange="toggleFields('{{ pdf_type.id }}')">
-                    <label for="include_{{ pdf_type.id }}" style="display: inline;">{{ pdf_type.name }}</label>
-                </h4>
-                <div id="fields_{{ pdf_type.id }}" style="display: none;">
+                <div class="pdf-entry-header" onclick="toggleCheckbox('include_{{ pdf_type.id }}')">
+                    <input type="checkbox" id="include_{{ pdf_type.id }}" name="include_{{ pdf_type.id }}" onchange="toggleFields('{{ pdf_type.id }}')" onclick="event.stopPropagation()">
+                    <div class="pdf-entry-title">{{ pdf_type.name }}</div>
+                </div>
+                <div id="fields_{{ pdf_type.id }}" style="display: none;" class="pdf-entry-fields">
                     <div class="form-group">
                         <label for="{{ pdf_type.id }}">Upload {{ pdf_type.name }} PDF</label>
-                        <input type="file" id="{{ pdf_type.id }}" name="{{ pdf_type.id }}" accept=".pdf">
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="{{ pdf_type.id }}" name="{{ pdf_type.id }}" accept=".pdf" onchange="updateFileName(this, 'file-name-{{ pdf_type.id }}')">
+                            <label for="{{ pdf_type.id }}" class="file-upload-button">
+                                <div class="file-upload-icon">📎</div>
+                                <div class="file-upload-text">Choose file</div>
+                                <div id="file-name-{{ pdf_type.id }}" class="file-name"></div>
+                            </label>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="page_{{ pdf_type.id }}">Insert after page:</label>
+                        <input type="number" id="page_{{ pdf_type.id }}" name="page_{{ pdf_type.id }}" value="{{ pdf_type.default_page }}" min="1">
                         {% if pdf_type.id == 'catalog' %}
-                        <input type="number" id="page_{{ pdf_type.id }}" name="page_{{ pdf_type.id }}" value="{{ pdf_type.default_page }}" min="1">
                         <small>Default is after the 'Datasheets' PDF. The page number will be adjusted automatically if 'Datasheets' is included.</small>
-                        {% else %}
-                        <input type="number" id="page_{{ pdf_type.id }}" name="page_{{ pdf_type.id }}" value="{{ pdf_type.default_page }}" min="1">
                         {% endif %}
                     </div>
                 </div>
             </div>
             {% endfor %}
 
-            <button type="submit" class="submit-btn">Merge PDFs</button>
+            <!-- Submit Button -->
+            <div class="submit-section">
+                <button type="submit" class="submit-btn">
+                    <span>✨ Merge PDFs ✨</span>
+                </button>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div class="loading-spinner" id="loading-spinner">
+                <div class="spinner"></div>
+                <p class="loading-text">Merging your PDFs...</p>
+            </div>
         </form>
     </div>
 
     <script>
+        // Toggle checkbox when clicking on the entire header
+        function toggleCheckbox(checkboxId) {
+            const checkbox = document.getElementById(checkboxId);
+            checkbox.checked = !checkbox.checked;
+            const pdfId = checkboxId.replace('include_', '');
+            toggleFields(pdfId);
+        }
+
+        // Toggle fields visibility with animation
         function toggleFields(pdfId) {
             const checkbox = document.getElementById('include_' + pdfId);
             const fieldsDiv = document.getElementById('fields_' + pdfId);
@@ -67,11 +673,44 @@
             if (checkbox.checked) {
                 fieldsDiv.style.display = 'block';
                 fileInput.required = true;
+                // Add animation class
+                setTimeout(() => {
+                    fieldsDiv.style.opacity = '1';
+                }, 10);
             } else {
-                fieldsDiv.style.display = 'none';
+                fieldsDiv.style.opacity = '0';
+                setTimeout(() => {
+                    fieldsDiv.style.display = 'none';
+                }, 300);
                 fileInput.required = false;
             }
         }
+
+        // Update file name display
+        function updateFileName(input, displayId) {
+            const display = document.getElementById(displayId);
+            if (input.files.length > 0) {
+                display.textContent = '📄 ' + input.files[0].name;
+                display.style.animation = 'slideUp 0.3s ease';
+            } else {
+                display.textContent = '';
+            }
+        }
+
+        // Show loading spinner on form submit
+        document.getElementById('merge-form').addEventListener('submit', function(e) {
+            document.getElementById('loading-spinner').style.display = 'block';
+            document.querySelector('.submit-btn').disabled = true;
+            document.querySelector('.submit-btn').style.opacity = '0.6';
+        });
+
+        // Remove welcome screen after animation
+        setTimeout(() => {
+            const welcomeScreen = document.getElementById('welcome-screen');
+            if (welcomeScreen) {
+                welcomeScreen.remove();
+            }
+        }, 3500);
     </script>
 </body>
 </html>
