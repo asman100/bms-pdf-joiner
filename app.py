@@ -6,6 +6,7 @@ import io
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500 MB limit
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Define the standard order and default insertion pages
@@ -29,7 +30,7 @@ def merge_pdfs():
     if 'template_pdf' not in request.files:
         return "No template PDF provided", 400
     
-template_file = request.files['template_pdf']
+    template_file = request.files['template_pdf']
     if template_file.filename == '':
         return "No selected template PDF", 400
 
