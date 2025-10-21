@@ -1,7 +1,8 @@
 import os
-from flask import Flask, request, render_template, send_file
+from flask import Flask, request, render_template, send_file, jsonify
 from pypdf import PdfWriter, PdfReader
 from werkzeug.utils import secure_filename
+from werkzeug.exceptions import RequestEntityTooLarge
 import io
 
 app = Flask(__name__)
@@ -24,6 +25,73 @@ PDF_TYPES = [
 @app.route('/')
 def index():
     return render_template('index.html', pdf_types=PDF_TYPES)
+
+@app.errorhandler(RequestEntityTooLarge)
+def handle_file_too_large(e):
+    return """
+    <html>
+    <head>
+        <title>File Too Large</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                margin: 0;
+                background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+                color: #f8fafc;
+            }
+            .error-container {
+                text-align: center;
+                padding: 2rem;
+                background: #1e2442;
+                border-radius: 16px;
+                max-width: 600px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            }
+            h1 {
+                color: #ef4444;
+                font-size: 2rem;
+                margin-bottom: 1rem;
+            }
+            p {
+                color: #cbd5e1;
+                line-height: 1.6;
+                margin-bottom: 1rem;
+            }
+            .back-button {
+                display: inline-block;
+                margin-top: 1.5rem;
+                padding: 0.75rem 2rem;
+                background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                color: white;
+                text-decoration: none;
+                border-radius: 8px;
+                font-weight: 600;
+                transition: transform 0.2s;
+            }
+            .back-button:hover {
+                transform: translateY(-2px);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="error-container">
+            <h1>⚠️ Files Too Large</h1>
+            <p>The files you're trying to upload exceed the maximum allowed size of 500 MB.</p>
+            <p>Please try:</p>
+            <ul style="text-align: left; margin: 1rem auto; max-width: 400px;">
+                <li>Reducing the file sizes by compressing PDFs</li>
+                <li>Uploading fewer files at once</li>
+                <li>Splitting large PDFs into smaller ones</li>
+            </ul>
+            <a href="/" class="back-button">← Go Back</a>
+        </div>
+    </body>
+    </html>
+    """, 413
 
 @app.route('/merge', methods=['POST'])
 def merge_pdfs():

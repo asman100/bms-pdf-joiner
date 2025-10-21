@@ -658,9 +658,10 @@
     </div>
 
     <script>
-        // Store page counts for each PDF
-        const pdfPageCounts = {};
-        
+        // Maximum file size in bytes (400 MB to be safe, server allows 500 MB)
+        const MAX_FILE_SIZE = 400 * 1024 * 1024;
+        const MAX_TOTAL_SIZE = 450 * 1024 * 1024;
+
         // Toggle checkbox when clicking on the entire header
         function toggleCheckbox(checkboxId) {
             const checkbox = document.getElementById(checkboxId);
@@ -813,19 +814,65 @@
             });
         }
 
+        // Format file size for display
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        // Validate file size
+        function validateFileSize(file) {
+            if (file.size > MAX_FILE_SIZE) {
+                alert(`File "${file.name}" is too large (${formatFileSize(file.size)}). Maximum file size is ${formatFileSize(MAX_FILE_SIZE)}.`);
+                return false;
+            }
+            return true;
+        }
+
         // Update file name display
         function updateFileName(input, displayId) {
             const display = document.getElementById(displayId);
             if (input.files.length > 0) {
-                display.textContent = '📄 ' + input.files[0].name;
+                const file = input.files[0];
+                if (!validateFileSize(file)) {
+                    input.value = '';
+                    display.textContent = '';
+                    return;
+                }
+                display.textContent = '📄 ' + file.name + ' (' + formatFileSize(file.size) + ')';
                 display.style.animation = 'slideUp 0.3s ease';
             } else {
                 display.textContent = '';
             }
         }
 
+        // Validate total upload size before submission
+        function validateTotalSize() {
+            let totalSize = 0;
+            const fileInputs = document.querySelectorAll('input[type="file"]');
+            
+            for (let input of fileInputs) {
+                if (input.files.length > 0) {
+                    totalSize += input.files[0].size;
+                }
+            }
+
+            if (totalSize > MAX_TOTAL_SIZE) {
+                alert(`Total upload size (${formatFileSize(totalSize)}) exceeds the maximum allowed (${formatFileSize(MAX_TOTAL_SIZE)}). Please reduce the file sizes or number of files.`);
+                return false;
+            }
+            return true;
+        }
+
         // Show loading spinner on form submit
         document.getElementById('merge-form').addEventListener('submit', function(e) {
+            if (!validateTotalSize()) {
+                e.preventDefault();
+                return false;
+            }
             document.getElementById('loading-spinner').style.display = 'block';
             document.querySelector('.submit-btn').disabled = true;
             document.querySelector('.submit-btn').style.opacity = '0.6';
