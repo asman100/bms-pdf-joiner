@@ -621,7 +621,7 @@
                     <div class="form-group">
                         <label for="{{ pdf_type.id }}">Upload {{ pdf_type.name }} PDF</label>
                         <div class="file-upload-wrapper">
-                            <input type="file" id="{{ pdf_type.id }}" name="{{ pdf_type.id }}" accept=".pdf" onchange="updateFileName(this, 'file-name-{{ pdf_type.id }}')">
+                            <input type="file" id="{{ pdf_type.id }}" name="{{ pdf_type.id }}" accept=".pdf" onchange="handleFileUpload(this, 'file-name-{{ pdf_type.id }}', '{{ pdf_type.id }}')">
                             <label for="{{ pdf_type.id }}" class="file-upload-button">
                                 <div class="file-upload-icon">📎</div>
                                 <div class="file-upload-text">Choose file</div>
@@ -631,9 +631,11 @@
                     </div>
                     <div class="form-group">
                         <label for="page_{{ pdf_type.id }}">Insert after page:</label>
-                        <input type="number" id="page_{{ pdf_type.id }}" name="page_{{ pdf_type.id }}" value="{{ pdf_type.default_page }}" min="1">
+                        <input type="number" id="page_{{ pdf_type.id }}" name="page_{{ pdf_type.id }}" value="{{ pdf_type.default_page }}" min="1" onchange="updateInsertionInfo()">
                         {% if pdf_type.id == 'catalog' %}
                         <small>Default is after the 'Datasheets' PDF. The page number will be adjusted automatically if 'Datasheets' is included.</small>
+                        {% else %}
+                        <small id="insertion-info-{{ pdf_type.id }}" style="color: var(--accent-primary);"></small>
                         {% endif %}
                     </div>
                 </div>
@@ -656,6 +658,9 @@
     </div>
 
     <script>
+        // Store page counts for each PDF
+        const pdfPageCounts = {};
+        
         // Toggle checkbox when clicking on the entire header
         function toggleCheckbox(checkboxId) {
             const checkbox = document.getElementById(checkboxId);
@@ -683,7 +688,129 @@
                     fieldsDiv.style.display = 'none';
                 }, 300);
                 fileInput.required = false;
+                // Clear page count when unchecked
+                delete pdfPageCounts[pdfId];
             }
+            
+            updateInsertionInfo();
+        }
+
+        // Handle file upload and get page count
+        async function handleFileUpload(input, displayId, pdfId) {
+            updateFileName(input, displayId);
+            
+            if (input.files.length > 0) {
+                const file = input.files[0];
+                try {
+                    // Read PDF and count pages
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pageCount = await getPdfPageCount(arrayBuffer);
+                    pdfPageCounts[pdfId] = pageCount;
+                    
+                    // Update the file name display to include page count
+                    const display = document.getElementById(displayId);
+                    if (display && pageCount) {
+                        display.textContent = `📄 ${file.name} (${pageCount} page${pageCount > 1 ? 's' : ''})`;
+                    }
+                    
+                    updateInsertionInfo();
+                } catch (error) {
+                    console.error('Error reading PDF:', error);
+                    // Still show the filename even if we can't read the page count
+                }
+            } else {
+                delete pdfPageCounts[pdfId];
+                updateInsertionInfo();
+            }
+        }
+
+        // Get PDF page count using a simple PDF parser
+        async function getPdfPageCount(arrayBuffer) {
+            try {
+                const uint8Array = new Uint8Array(arrayBuffer);
+                const text = new TextDecoder('latin1').decode(uint8Array);
+                
+                // Look for /Type /Pages entries
+                const matches = text.match(/\/Type\s*\/Page[^s]/g);
+                if (matches) {
+                    return matches.length;
+                }
+                
+                // Fallback: try to find /Count in catalog
+                const countMatch = text.match(/\/Type\s*\/Pages[^]*?\/Count\s+(\d+)/);
+                if (countMatch) {
+                    return parseInt(countMatch[1], 10);
+                }
+                
+                return null;
+            } catch (error) {
+                console.error('Error parsing PDF:', error);
+                return null;
+            }
+        }
+
+        // Update insertion information for all PDFs
+        function updateInsertionInfo() {
+            const pdfTypes = {{ pdf_types | tojson }};
+            
+            // Get all insertions with their page numbers and page counts
+            const insertions = [];
+            pdfTypes.forEach(pdfType => {
+                const checkbox = document.getElementById('include_' + pdfType.id);
+                const pageInput = document.getElementById('page_' + pdfType.id);
+                
+                if (checkbox && checkbox.checked && pageInput) {
+                    const pageNumber = parseInt(pageInput.value) || pdfType.default_page;
+                    const pageCount = pdfPageCounts[pdfType.id] || 0;
+                    
+                    insertions.push({
+                        id: pdfType.id,
+                        pageNumber: pageNumber,
+                        pageCount: pageCount
+                    });
+                }
+            });
+            
+            // Sort by page number
+            insertions.sort((a, b) => a.pageNumber - b.pageNumber);
+            
+            // Calculate cumulative positions
+            let cumulativeOffset = 0;
+            const positions = {};
+            
+            insertions.forEach(insertion => {
+                // The insertion happens after page X of the template
+                // Position in final document = template pages up to X + cumulative offset + 1
+                const positionInFinal = insertion.pageNumber + cumulativeOffset;
+                positions[insertion.id] = positionInFinal;
+                cumulativeOffset += insertion.pageCount;
+            });
+            
+            // Update the display for each PDF
+            pdfTypes.forEach(pdfType => {
+                if (pdfType.id === 'catalog') return; // Skip catalog (has special handling)
+                
+                const infoElement = document.getElementById('insertion-info-' + pdfType.id);
+                if (!infoElement) return;
+                
+                const checkbox = document.getElementById('include_' + pdfType.id);
+                if (!checkbox || !checkbox.checked) {
+                    infoElement.textContent = '';
+                    return;
+                }
+                
+                const position = positions[pdfType.id];
+                const pageCount = pdfPageCounts[pdfType.id];
+                
+                if (position && pageCount) {
+                    const endPosition = position + pageCount;
+                    infoElement.textContent = `This PDF will appear at pages ${position + 1}-${endPosition} in the final document`;
+                } else if (position) {
+                    infoElement.textContent = `This PDF will be inserted after page ${position} in the final document`;
+                } else {
+                    infoElement.textContent = '';
+                }
+            });
         }
 
         // Update file name display
