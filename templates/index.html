@@ -12,24 +12,24 @@
         }
 
         :root {
-            --bg-primary: #0a0e27;
-            --bg-secondary: #151a35;
-            --bg-card: #1e2442;
-            --accent-primary: #6366f1;
-            --accent-secondary: #8b5cf6;
-            --accent-hover: #4f46e5;
+            --bg-primary: #000000;
+            --bg-secondary: #0d0d0d;
+            --bg-card: #1a1a1a;
+            --accent-primary: #2d2d2d;
+            --accent-secondary: #3d3d3d;
+            --accent-hover: #404040;
             --text-primary: #f8fafc;
             --text-secondary: #cbd5e1;
             --text-muted: #94a3b8;
-            --border-color: #334155;
+            --border-color: #2d2d2d;
             --success: #10b981;
             --success-hover: #059669;
-            --shadow: rgba(0, 0, 0, 0.3);
+            --shadow: rgba(0, 0, 0, 0.5);
         }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, var(--bg-primary) 0%, #1a1f3a 100%);
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #0d0d0d 100%);
             color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
@@ -42,7 +42,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1529 100%);
+            background: linear-gradient(135deg, #000000 0%, #0d0d0d 50%, #1a1a1a 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -92,7 +92,7 @@
         .welcome-title {
             font-size: 2.5rem;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            background: linear-gradient(135deg, #ffffff, #a0a0a0);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -115,7 +115,7 @@
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            background: var(--accent-primary);
+            background: #ffffff;
             animation: bounce 1.4s infinite ease-in-out both;
         }
 
@@ -176,7 +176,7 @@
         h1 {
             font-size: 2.5rem;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            background: linear-gradient(135deg, #ffffff, #a0a0a0);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -206,7 +206,7 @@
 
         /* Template Upload Section */
         .template-section {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            background: linear-gradient(135deg, rgba(45, 45, 45, 0.2), rgba(61, 61, 61, 0.2));
         }
 
         .section-title {
@@ -257,7 +257,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.2), transparent);
+            background: linear-gradient(90deg, transparent, rgba(45, 45, 45, 0.4), transparent);
             transition: left 0.5s ease;
         }
 
@@ -267,7 +267,7 @@
 
         .file-upload-button:hover {
             border-color: var(--accent-primary);
-            background: rgba(99, 102, 241, 0.1);
+            background: rgba(45, 45, 45, 0.3);
             transform: scale(1.02);
         }
 
@@ -283,7 +283,7 @@
 
         .file-name {
             margin-top: 0.5rem;
-            color: var(--accent-primary);
+            color: #ffffff;
             font-size: 0.9rem;
             font-weight: 500;
         }
@@ -324,7 +324,7 @@
             left: 0;
             width: 4px;
             height: 100%;
-            background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary));
+            background: linear-gradient(180deg, #3d3d3d, #505050);
             transform: scaleY(0);
             transition: transform 0.3s ease;
         }
@@ -364,7 +364,7 @@
         }
 
         input[type="checkbox"]:checked {
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            background: linear-gradient(135deg, #2d2d2d, #3d3d3d);
             border-color: var(--accent-primary);
         }
 
@@ -437,7 +437,7 @@
         input[type="number"]:focus {
             outline: none;
             border-color: var(--accent-primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            box-shadow: 0 0 0 3px rgba(45, 45, 45, 0.3);
         }
 
         small {
@@ -454,7 +454,7 @@
         }
 
         .submit-btn {
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            background: linear-gradient(135deg, #2d2d2d, #3d3d3d);
             color: white;
             padding: 1rem 3rem;
             border: none;
@@ -463,7 +463,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
             position: relative;
             overflow: hidden;
         }
@@ -488,7 +488,7 @@
 
         .submit-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
         }
 
         .submit-btn:active {
@@ -509,7 +509,7 @@
 
         .spinner {
             border: 4px solid var(--border-color);
-            border-top: 4px solid var(--accent-primary);
+            border-top: 4px solid #ffffff;
             border-radius: 50%;
             width: 50px;
             height: 50px;
@@ -556,12 +556,12 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--accent-primary);
+            background: #3d3d3d;
             border-radius: 5px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-hover);
+            background: #505050;
         }
     </style>
 </head>
@@ -569,7 +569,7 @@
     <!-- Welcome Screen -->
     <div id="welcome-screen">
         <div class="welcome-content">
-            <div class="welcome-logo">📄✨</div>
+            <div class="welcome-logo">📄</div>
             <h1 class="welcome-title">BMS PDF Joiner</h1>
             <p class="welcome-subtitle">Merge your PDFs with style</p>
             <div class="loading-dots">
@@ -621,7 +621,7 @@
                     <div class="form-group">
                         <label for="{{ pdf_type.id }}">Upload {{ pdf_type.name }} PDF</label>
                         <div class="file-upload-wrapper">
-                            <input type="file" id="{{ pdf_type.id }}" name="{{ pdf_type.id }}" accept=".pdf" onchange="updateFileName(this, 'file-name-{{ pdf_type.id }}')">
+                            <input type="file" id="{{ pdf_type.id }}" name="{{ pdf_type.id }}" accept=".pdf" onchange="handleFileUpload(this, 'file-name-{{ pdf_type.id }}', '{{ pdf_type.id }}')">
                             <label for="{{ pdf_type.id }}" class="file-upload-button">
                                 <div class="file-upload-icon">📎</div>
                                 <div class="file-upload-text">Choose file</div>
@@ -631,9 +631,11 @@
                     </div>
                     <div class="form-group">
                         <label for="page_{{ pdf_type.id }}">Insert after page:</label>
-                        <input type="number" id="page_{{ pdf_type.id }}" name="page_{{ pdf_type.id }}" value="{{ pdf_type.default_page }}" min="1">
+                        <input type="number" id="page_{{ pdf_type.id }}" name="page_{{ pdf_type.id }}" value="{{ pdf_type.default_page }}" min="1" onchange="updateInsertionInfo()">
                         {% if pdf_type.id == 'catalog' %}
                         <small>Default is after the 'Datasheets' PDF. The page number will be adjusted automatically if 'Datasheets' is included.</small>
+                        {% else %}
+                        <small id="insertion-info-{{ pdf_type.id }}" style="color: var(--accent-primary);"></small>
                         {% endif %}
                     </div>
                 </div>
@@ -643,7 +645,7 @@
             <!-- Submit Button -->
             <div class="submit-section">
                 <button type="submit" class="submit-btn">
-                    <span>✨ Merge PDFs ✨</span>
+                    <span>Merge PDFs</span>
                 </button>
             </div>
 
@@ -687,7 +689,129 @@
                     fieldsDiv.style.display = 'none';
                 }, 300);
                 fileInput.required = false;
+                // Clear page count when unchecked
+                delete pdfPageCounts[pdfId];
             }
+            
+            updateInsertionInfo();
+        }
+
+        // Handle file upload and get page count
+        async function handleFileUpload(input, displayId, pdfId) {
+            updateFileName(input, displayId);
+            
+            if (input.files.length > 0) {
+                const file = input.files[0];
+                try {
+                    // Read PDF and count pages
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pageCount = await getPdfPageCount(arrayBuffer);
+                    pdfPageCounts[pdfId] = pageCount;
+                    
+                    // Update the file name display to include page count
+                    const display = document.getElementById(displayId);
+                    if (display && pageCount) {
+                        display.textContent = `📄 ${file.name} (${pageCount} page${pageCount > 1 ? 's' : ''})`;
+                    }
+                    
+                    updateInsertionInfo();
+                } catch (error) {
+                    console.error('Error reading PDF:', error);
+                    // Still show the filename even if we can't read the page count
+                }
+            } else {
+                delete pdfPageCounts[pdfId];
+                updateInsertionInfo();
+            }
+        }
+
+        // Get PDF page count using a simple PDF parser
+        async function getPdfPageCount(arrayBuffer) {
+            try {
+                const uint8Array = new Uint8Array(arrayBuffer);
+                const text = new TextDecoder('latin1').decode(uint8Array);
+                
+                // Look for /Type /Pages entries
+                const matches = text.match(/\/Type\s*\/Page[^s]/g);
+                if (matches) {
+                    return matches.length;
+                }
+                
+                // Fallback: try to find /Count in catalog
+                const countMatch = text.match(/\/Type\s*\/Pages[^]*?\/Count\s+(\d+)/);
+                if (countMatch) {
+                    return parseInt(countMatch[1], 10);
+                }
+                
+                return null;
+            } catch (error) {
+                console.error('Error parsing PDF:', error);
+                return null;
+            }
+        }
+
+        // Update insertion information for all PDFs
+        function updateInsertionInfo() {
+            const pdfTypes = {{ pdf_types | tojson }};
+            
+            // Get all insertions with their page numbers and page counts
+            const insertions = [];
+            pdfTypes.forEach(pdfType => {
+                const checkbox = document.getElementById('include_' + pdfType.id);
+                const pageInput = document.getElementById('page_' + pdfType.id);
+                
+                if (checkbox && checkbox.checked && pageInput) {
+                    const pageNumber = parseInt(pageInput.value) || pdfType.default_page;
+                    const pageCount = pdfPageCounts[pdfType.id] || 0;
+                    
+                    insertions.push({
+                        id: pdfType.id,
+                        pageNumber: pageNumber,
+                        pageCount: pageCount
+                    });
+                }
+            });
+            
+            // Sort by page number
+            insertions.sort((a, b) => a.pageNumber - b.pageNumber);
+            
+            // Calculate cumulative positions
+            let cumulativeOffset = 0;
+            const positions = {};
+            
+            insertions.forEach(insertion => {
+                // The insertion happens after page X of the template
+                // Position in final document = template pages up to X + cumulative offset + 1
+                const positionInFinal = insertion.pageNumber + cumulativeOffset;
+                positions[insertion.id] = positionInFinal;
+                cumulativeOffset += insertion.pageCount;
+            });
+            
+            // Update the display for each PDF
+            pdfTypes.forEach(pdfType => {
+                if (pdfType.id === 'catalog') return; // Skip catalog (has special handling)
+                
+                const infoElement = document.getElementById('insertion-info-' + pdfType.id);
+                if (!infoElement) return;
+                
+                const checkbox = document.getElementById('include_' + pdfType.id);
+                if (!checkbox || !checkbox.checked) {
+                    infoElement.textContent = '';
+                    return;
+                }
+                
+                const position = positions[pdfType.id];
+                const pageCount = pdfPageCounts[pdfType.id];
+                
+                if (position && pageCount) {
+                    const endPosition = position + pageCount;
+                    infoElement.textContent = `This PDF will appear at pages ${position + 1}-${endPosition} in the final document`;
+                } else if (position) {
+                    infoElement.textContent = `This PDF will be inserted after page ${position} in the final document`;
+                } else {
+                    infoElement.textContent = '';
+                }
+            });
         }
 
         // Format file size for display
